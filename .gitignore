@@ -8,3 +8,5 @@ client/node_modules/
 node_modules/
 dist/
 .env
+.neon
+.env.local

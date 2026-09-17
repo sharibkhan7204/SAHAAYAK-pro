@@ -7,18 +7,10 @@ async function initDatabase() {
   console.log('[INIT] Initializing database schema...');
   const schemaSql = fs.readFileSync(path.join(__dirname, 'schema.sql'), 'utf-8');
   
-  // Split statements and execute
-  const statements = schemaSql
-    .split(';')
-    .map(s => s.trim())
-    .filter(s => s.length > 0);
-
-  for (const stmt of statements) {
-    try {
-      await db.run(stmt);
-    } catch (err) {
-      console.error('[INIT] Error executing schema statement:', err.message, '\nStatement:', stmt.substring(0, 80));
-    }
+  try {
+    await db.exec(schemaSql);
+  } catch (err) {
+    console.error('[INIT] Error executing schema:', err.message);
   }
 
   console.log('[INIT] Schema applied successfully.');

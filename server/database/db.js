@@ -22,7 +22,7 @@ if (process.env.DATABASE_URL) {
       ssl: isLocalhost ? false : { rejectUnauthorized: false },
       max: process.env.PG_MAX_CONNECTIONS ? parseInt(process.env.PG_MAX_CONNECTIONS) : 10,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 5000
+      connectionTimeoutMillis: 30000
     });
 
     // Prevent idle client errors from crashing the server
