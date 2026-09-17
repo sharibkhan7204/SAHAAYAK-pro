@@ -1,0 +1,7 @@
+server/database/*.db
+server/database/*.db-shm
+server/database/*.db-wal
+server/uploads/*.pdf
+server/uploads/*.png
+server/node_modules/
+node_modules/

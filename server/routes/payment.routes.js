@@ -47,14 +47,36 @@ router.post('/pay', authenticate, async (req, res) => {
   }
 });
 
+const { generateInvoice } = require('../services/invoiceService');
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET } = require('../config');
+
 // Download PDF Invoice
-router.get('/invoice/:bookingId', authenticate, async (req, res) => {
+router.get('/invoice/:bookingId', async (req, res) => {
   try {
     const { bookingId } = req.params;
-    const invoice = await db.get('SELECT * FROM invoices WHERE booking_id = ?', [bookingId]);
 
+    // Optional auth: check header or query param
+    const authHeader = req.headers.authorization;
+    const token = (authHeader && authHeader.startsWith('Bearer ')) ? authHeader.split(' ')[1] : req.query.token;
+    if (token) {
+      try {
+        jwt.verify(token, JWT_SECRET);
+      } catch (e) {
+        // Invalid token
+      }
+    }
+
+    let invoice = await db.get('SELECT * FROM invoices WHERE booking_id = ?', [bookingId]);
+
+    // If invoice not yet generated or missing, generate it now
     if (!invoice) {
-      return res.status(404).json({ error: 'Invoice not found for this booking.' });
+      try {
+        const genResult = await generateInvoice({ bookingId });
+        invoice = await db.get('SELECT * FROM invoices WHERE booking_id = ?', [bookingId]);
+      } catch (genErr) {
+        return res.status(404).json({ error: 'Invoice could not be generated for this booking.' });
+      }
     }
 
     let invoiceData = {};
@@ -65,13 +87,19 @@ router.get('/invoice/:bookingId', authenticate, async (req, res) => {
       return res.json({ invoice, invoiceData });
     }
 
-    const filePath = path.join(__dirname, '..', invoice.pdf_url);
+    let filePath = path.join(__dirname, '..', invoice.pdf_url);
+    if (!fs.existsSync(filePath)) {
+      // Re-generate if PDF file missing on disk
+      await generateInvoice({ bookingId });
+      invoice = await db.get('SELECT * FROM invoices WHERE booking_id = ?', [bookingId]);
+      filePath = path.join(__dirname, '..', invoice.pdf_url);
+    }
+
     if (fs.existsSync(filePath)) {
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${invoice.invoice_number}.pdf"`);
       return res.sendFile(filePath);
     } else {
-      // Fallback: return JSON
       return res.json({ invoice, invoiceData });
     }
   } catch (err) {

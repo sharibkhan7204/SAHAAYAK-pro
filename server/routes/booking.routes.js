@@ -5,6 +5,7 @@ const db = require('../database/db');
 const { authenticate } = require('../middleware/auth');
 const { autoAssignBooking, calculateHaversineDistance } = require('../services/assignmentEngine');
 const { createNotification } = require('../services/notificationService');
+const { processPayment } = require('../services/paymentService');
 
 router.use(authenticate);
 
@@ -667,7 +668,58 @@ router.post('/:id/cancel', async (req, res) => {
   }
 });
 
+/**
+ * Record Cash / Demo Payment (Worker or Customer)
+ * Fixes: "when worker click the cash is collected, endpoint has something issue"
+ */
+async function handlePayDemo(req, res) {
+  try {
+    const bookingId = req.params.id;
+    const { method = 'cash', tipAmount = 0 } = req.body;
+
+    const booking = await db.get(
+      `SELECT b.*, c.user_id as cust_user_id, w.user_id as wrk_user_id
+       FROM bookings b
+       JOIN customers c ON b.customer_id = c.id
+       LEFT JOIN workers w ON b.worker_id = w.id
+       WHERE b.id = ?`,
+      [bookingId]
+    );
+
+    if (!booking) return res.status(404).json({ error: 'Booking not found.' });
+
+    // Validate authorization
+    if (req.user.role === 'customer' && req.user.id !== booking.cust_user_id) {
+      return res.status(403).json({ error: 'Unauthorized to pay for this booking.' });
+    }
+    if (req.user.role === 'worker' && req.user.id !== booking.wrk_user_id) {
+      return res.status(403).json({ error: 'Unauthorized: you are not the assigned worker for this booking.' });
+    }
+
+    const result = await processPayment({
+      bookingId,
+      customerId: booking.customer_id,
+      workerId: booking.worker_id,
+      paymentMethod: method,
+      tipAmount: Number(tipAmount) || 0,
+      transactionReference: `${method.toUpperCase()}_COLLECTED_${Date.now()}`
+    });
+
+    res.json({
+      message: 'Payment recorded and invoice generated successfully.',
+      ...result
+    });
+  } catch (err) {
+    console.error('[Pay Demo / Cash Error]:', err);
+    res.status(500).json({ error: err.message || 'Failed to record payment.' });
+  }
+}
+
+router.post('/:id/pay-demo', handlePayDemo);
+router.post('/:id/cash-collected', handlePayDemo);
+
 module.exports = {
   router,
   setSocketIo
 };
+

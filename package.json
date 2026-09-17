@@ -1,0 +1,15 @@
+{
+  "name": "sahaayak-platform",
+  "version": "1.0.0",
+  "description": "Sahaayak - Transparent Fair Gig Marketplace & Doorstep Services Platform",
+  "scripts": {
+    "start": "node run-all.js",
+    "dev": "node run-all.js",
+    "server": "npm --prefix server dev",
+    "client": "npm --prefix client dev",
+    "seed": "npm --prefix server seed"
+  },
+  "keywords": ["sahaayak", "doorstep-services", "gig-platform"],
+  "author": "Sahaayak Team",
+  "license": "ISC"
+}
