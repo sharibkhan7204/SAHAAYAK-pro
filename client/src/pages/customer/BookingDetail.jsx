@@ -163,7 +163,8 @@ export default function BookingDetail() {
     } catch (err) {
       console.warn('Invoice blob download failed, trying direct link...', err);
       if (invoice?.pdf_url) {
-        window.open(`http://localhost:5000${invoice.pdf_url}`, '_blank');
+        const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+        window.open(`${serverUrl}${invoice.pdf_url}`, '_blank');
       } else {
         addToast('Failed to download invoice. Please try again.', 'error');
       }

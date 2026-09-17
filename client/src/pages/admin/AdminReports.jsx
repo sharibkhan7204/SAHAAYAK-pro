@@ -28,8 +28,9 @@ export default function AdminReports() {
 
   const handleDownloadCSV = () => {
     const token = localStorage.getItem('sahaayak_token');
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
     // Direct browser trigger to stream download attachment
-    window.open(`http://localhost:5000/api/reports/${activeTab}?format=csv&token=${token}`, '_blank');
+    window.open(`${apiUrl}/reports/${activeTab}?format=csv&token=${token}`, '_blank');
     addToast(`Exporting ${activeTab} report as CSV...`, 'info');
   };
 
