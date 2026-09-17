@@ -100,10 +100,15 @@ io.on('connection', (socket) => {
 });
 
 // Start Server
-server.listen(PORT, () => {
-  console.log(`====================================================`);
-  console.log(` 🚀 SAHAAYAK BACKEND SERVER ONLINE ON PORT ${PORT}`);
-  console.log(` 🌐 Health: http://localhost:${PORT}/api/health`);
-  console.log(` 🔑 Demo Accounts: http://localhost:${PORT}/api/auth/demo-accounts`);
-  console.log(`====================================================`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(PORT, () => {
+    console.log(`====================================================`);
+    console.log(` 🚀 SAHAAYAK BACKEND SERVER ONLINE ON PORT ${PORT}`);
+    console.log(` 🌐 Health: http://localhost:${PORT}/api/health`);
+    console.log(` 🔑 Demo Accounts: http://localhost:${PORT}/api/auth/demo-accounts`);
+    console.log(`====================================================`);
+  });
+}
+
+module.exports = app;
+

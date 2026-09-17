@@ -7,32 +7,51 @@ dotenv.config();
 let dbClient = null;
 let isPostgres = false;
 
-// If DATABASE_URL is configured and not empty, attempt PostgreSQL connection
+// If DATABASE_URL is configured, initialize PostgreSQL connection pool
 if (process.env.DATABASE_URL) {
   try {
     const { Pool } = require('pg');
+    
+    // Cloud providers (Neon, Supabase, RDS, Render) require SSL
+    const isLocalhost = 
+      process.env.DATABASE_URL.includes('localhost') || 
+      process.env.DATABASE_URL.includes('127.0.0.1');
+
     const pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+      ssl: isLocalhost ? false : { rejectUnauthorized: false },
+      max: process.env.PG_MAX_CONNECTIONS ? parseInt(process.env.PG_MAX_CONNECTIONS) : 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000
     });
+
+    // Prevent idle client errors from crashing the server
+    pool.on('error', (err) => {
+      console.error('[DB] Unexpected PostgreSQL pool error on idle client:', err);
+    });
+
     dbClient = pool;
     isPostgres = true;
-    console.log('[DB] Using PostgreSQL connection pool.');
+    console.log('[DB] Successfully initialized PostgreSQL connection pool.');
   } catch (err) {
-    console.warn('[DB] PostgreSQL initialization failed, falling back to SQLite:', err.message);
+    console.warn('[DB] PostgreSQL initialization failed:', err.message);
   }
 }
 
-// Fallback to better-sqlite3 for zero-setup local/hackathon demo
+// Fallback to better-sqlite3 for local development only
 if (!dbClient) {
-  const Database = require('better-sqlite3');
-  const dbPath = path.join(__dirname, 'sahaayak.db');
-  const sqlite = new Database(dbPath);
-  sqlite.pragma('journal_mode = WAL');
-  sqlite.pragma('foreign_keys = ON');
-  dbClient = sqlite;
-  isPostgres = false;
-  console.log(`[DB] Using embedded SQLite database at: ${dbPath}`);
+  try {
+    const Database = require('better-sqlite3');
+    const dbPath = path.join(__dirname, 'sahaayak.db');
+    const sqlite = new Database(dbPath);
+    sqlite.pragma('journal_mode = WAL');
+    sqlite.pragma('foreign_keys = ON');
+    dbClient = sqlite;
+    isPostgres = false;
+    console.log(`[DB] Using embedded SQLite database at: ${dbPath}`);
+  } catch (err) {
+    console.error('[DB] SQLite fallback failed (expected on serverless platforms if native addon is omitted):', err.message);
+  }
 }
 
 /**
