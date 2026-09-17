@@ -42,16 +42,16 @@ export default function BecomeWorker() {
     <div className="space-y-16 py-12">
       {/* Hero Header */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-saffron-100 text-saffron-800 text-xs font-semibold">
-          <Sparkles className="w-3.5 h-3.5 text-saffron-600" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-saffron-100 dark:bg-amber-950/80 text-saffron-800 dark:text-amber-300 text-xs font-semibold border border-transparent dark:border-amber-800">
+          <Sparkles className="w-3.5 h-3.5 text-saffron-600 dark:text-saffron-400" />
           <span>Join 500+ Verified Service Partners across Bengaluru</span>
         </div>
 
-        <h1 className="text-4xl sm:text-5xl font-extrabold font-display text-slate-900 tracking-tight max-w-3xl mx-auto leading-tight">
+        <h1 className="text-4xl sm:text-5xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight max-w-3xl mx-auto leading-tight">
           Earn More, Work Locally, and Keep What You Deserve.
         </h1>
 
-        <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
           Sahaayak is built for worker independence. Zero commission on small jobs, transparent earnings tracking,
           and automatic doorstep job assignments.
         </p>
@@ -71,12 +71,12 @@ export default function BecomeWorker() {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {benefits.map((b, i) => (
-            <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center">
+            <div key={i} className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center">
                 {b.icon}
               </div>
-              <h3 className="font-bold text-base text-slate-900">{b.title}</h3>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{b.desc}</p>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">{b.title}</h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{b.desc}</p>
             </div>
           ))}
         </div>

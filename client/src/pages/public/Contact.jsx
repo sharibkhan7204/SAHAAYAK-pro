@@ -16,10 +16,10 @@ export default function Contact() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-12">
       <div className="text-center space-y-3">
-        <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-slate-900 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight">
           Customer & Partner Support
         </h1>
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           Have an inquiry, feedback, or need help with an active booking? We are here 7 days a week.
         </p>
       </div>
@@ -64,14 +64,14 @@ export default function Contact() {
         </div>
 
         {/* Form Column */}
-        <div className="md:col-span-7 bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+        <div className="md:col-span-7 bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           {submitted ? (
             <div className="text-center py-12 space-y-3">
-              <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Message Dispatched</h3>
-              <p className="text-xs text-slate-600 max-w-sm mx-auto">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Message Dispatched</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-300 max-w-sm mx-auto">
                 A Sahaayak support representative will contact you via phone or email shortly.
               </p>
             </div>
@@ -79,57 +79,57 @@ export default function Contact() {
             <form onSubmit={handleSubmit} className="space-y-4 text-xs sm:text-sm">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">Your Name</label>
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">Your Name</label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs"
                     placeholder="E.g. Priya Sharma"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="font-semibold text-slate-700">Mobile Number</label>
+                  <label className="font-semibold text-slate-700 dark:text-slate-300">Mobile Number</label>
                   <input
                     type="tel"
                     required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs"
                     placeholder="+91 98765 00000"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Email Address</label>
+                <label className="font-semibold text-slate-700 dark:text-slate-300">Email Address</label>
                 <input
                   type="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs"
                   placeholder="priya@example.com"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Message</label>
+                <label className="font-semibold text-slate-700 dark:text-slate-300">Message</label>
                 <textarea
                   required
                   rows={4}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500 text-xs"
                   placeholder="How can we assist you today?"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md transition-colors flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 <span>Send Support Request</span>
                 <Send className="w-3.5 h-3.5" />

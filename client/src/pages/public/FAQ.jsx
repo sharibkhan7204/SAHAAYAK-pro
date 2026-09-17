@@ -57,10 +57,10 @@ export default function FAQ() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-10">
       <div className="text-center space-y-3">
-        <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-slate-900 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight">
           Frequently Asked Questions
         </h1>
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           Find answers to common questions about booking, payments, verification, and worker protection.
         </p>
       </div>
@@ -68,22 +68,22 @@ export default function FAQ() {
       <div className="space-y-8">
         {categories.map((cat, ci) => (
           <div key={ci} className="space-y-3">
-            <h2 className="text-lg font-bold text-slate-900">{cat.name}</h2>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">{cat.name}</h2>
             <div className="space-y-2.5">
               {cat.items.map((item, ii) => {
                 const key = `${ci}-${ii}`;
                 const isOpen = openIdx === key;
                 return (
-                  <div key={key} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                  <div key={key} className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
                     <button
                       onClick={() => setOpenIdx(isOpen ? null : key)}
-                      className="w-full text-left p-4 sm:p-5 flex items-center justify-between font-semibold text-sm text-slate-900 hover:bg-slate-50 transition-colors"
+                      className="w-full text-left p-4 sm:p-5 flex items-center justify-between font-semibold text-sm text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors cursor-pointer"
                     >
                       <span>{item.q}</span>
                       <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
                     </button>
                     {isOpen && (
-                      <div className="p-4 sm:p-5 pt-0 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-100 bg-slate-50/40">
+                      <div className="p-4 sm:p-5 pt-0 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-100 dark:border-slate-800 bg-slate-50/40 dark:bg-slate-950/40">
                         {item.a}
                       </div>
                     )}

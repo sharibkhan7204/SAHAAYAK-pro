@@ -39,10 +39,10 @@ export default function HowItWorks() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       <div className="text-center space-y-3 max-w-2xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-slate-900 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight">
           How Sahaayak Works
         </h1>
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-600 dark:text-slate-300">
           A transparent, automated doorstep service experience engineered for trust, fairness, and safety.
         </p>
       </div>
@@ -51,19 +51,19 @@ export default function HowItWorks() {
         {steps.map((step, idx) => (
           <div
             key={idx}
-            className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center gap-6 group hover:border-brand-300 transition-all"
+            className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center gap-6 group hover:border-brand-300 dark:hover:border-brand-500/50 transition-all"
           >
-            <div className="w-14 h-14 rounded-2xl bg-brand-50 text-brand-700 font-extrabold font-display text-xl flex items-center justify-center shrink-0 border border-brand-200">
+            <div className="w-14 h-14 rounded-2xl bg-brand-50 dark:bg-brand-950 text-brand-700 dark:text-brand-300 font-extrabold font-display text-xl flex items-center justify-center shrink-0 border border-brand-200 dark:border-brand-800">
               {step.num}
             </div>
             <div className="flex-1 space-y-1.5">
               <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-bold text-base text-slate-900">{step.title}</h3>
-                <span className="bg-brand-100 text-brand-800 text-[11px] font-semibold px-2 py-0.5 rounded-full">
+                <h3 className="font-bold text-base text-slate-900 dark:text-white">{step.title}</h3>
+                <span className="bg-brand-100 dark:bg-brand-950 text-brand-800 dark:text-brand-300 text-[11px] font-semibold px-2 py-0.5 rounded-full border border-transparent dark:border-brand-800">
                   {step.highlight}
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{step.desc}</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{step.desc}</p>
             </div>
           </div>
         ))}
