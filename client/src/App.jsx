@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastProvider } from './contexts/ToastContext';
 import { SocketProvider } from './contexts/SocketContext';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 
 // Layouts
 import PublicLayout from './layouts/PublicLayout';
@@ -59,9 +60,10 @@ import AdminReports from './pages/admin/AdminReports';
 export default function App() {
   return (
     <BrowserRouter>
-      <SocketProvider>
-        <AuthProvider>
-          <ToastProvider>
+      <ThemeProvider>
+        <SocketProvider>
+          <AuthProvider>
+            <ToastProvider>
             <Routes>
               {/* Public Routes */}
               <Route element={<PublicLayout />}>
@@ -77,6 +79,7 @@ export default function App() {
                 <Route path="/customer-signup" element={<CustomerSignup />} />
                 <Route path="/register" element={<CustomerSignup />} />
                 <Route path="/worker-signup" element={<WorkerSignup />} />
+                <Route path="/book" element={<BookService />} />
                 <Route path="/book/:serviceId" element={<BookService />} />
               </Route>
 
@@ -148,6 +151,7 @@ export default function App() {
           </ToastProvider>
         </AuthProvider>
       </SocketProvider>
-    </BrowserRouter>
-  );
+    </ThemeProvider>
+  </BrowserRouter>
+);
 }

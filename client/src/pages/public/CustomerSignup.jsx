@@ -113,8 +113,15 @@ export default function CustomerSignup() {
       <div className="bg-white rounded-3xl p-7 sm:p-9 border border-slate-200 shadow-xl space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-bold border border-brand-200">
-            <Sparkles className="w-3.5 h-3.5 text-saffron-500" /> Pay-After-Service Guaranteed
+          <Link to="/" className="inline-flex items-center gap-2 group mb-1">
+            <div className="w-14 h-14 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center p-2 shadow-lg shadow-slate-950/20 group-hover:scale-105 transition-transform">
+              <img src="/logo.png" alt="Sahaayak Logo" className="w-full h-full object-contain filter drop-shadow" />
+            </div>
+          </Link>
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-bold border border-brand-200">
+              <Sparkles className="w-3.5 h-3.5 text-saffron-500" /> Pay-After-Service Guaranteed
+            </div>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-slate-900 tracking-tight">
             Create Customer Account

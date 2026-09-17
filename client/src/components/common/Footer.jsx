@@ -10,8 +10,8 @@ export default function Footer() {
           {/* Col 1: Brand */}
           <div className="lg:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-saffron-500 flex items-center justify-center text-white font-bold text-lg">
-                S
+              <div className="w-11 h-11 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center p-1.5 shadow-sm">
+                <img src="/logo.png" alt="Sahaayak Logo" className="w-full h-full object-contain filter drop-shadow brightness-110" />
               </div>
               <span className="text-xl font-bold font-display text-white tracking-tight">Sahaayak.</span>
             </Link>

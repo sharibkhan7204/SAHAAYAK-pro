@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, Navigate, useNavigate } from 'react-router-d
 import { useAuth } from '../contexts/AuthContext';
 import { useSocket } from '../contexts/SocketContext';
 import { useToast } from '../contexts/ToastContext';
-import DemoSwitcher from '../components/common/DemoSwitcher';
+// Remove DemoSwitcher import
 import Navbar from '../components/common/Navbar';
 import api from '../services/api';
 import { LayoutDashboard, Briefcase, IndianRupee, UserCheck, Power, Navigation, Bell } from 'lucide-react';
@@ -103,15 +103,14 @@ export default function WorkerLayout() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 pb-16 md:pb-0">
-      <DemoSwitcher />
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 md:pb-0 transition-colors">
       
       {/* Worker Portal Header */}
       <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-30 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link to="/worker/dashboard" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-brand-600 text-white font-extrabold flex items-center justify-center text-sm shadow-sm">
-              W
+            <div className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center p-1 shadow-sm">
+              <img src="/logo.png" alt="Sahaayak Logo" className="w-full h-full object-contain" />
             </div>
             <div>
               <span className="font-bold font-display text-slate-900 tracking-tight">Sahaayak Partner</span>

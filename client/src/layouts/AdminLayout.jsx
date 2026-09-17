@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import DemoSwitcher from '../components/common/DemoSwitcher';
 import {
   LayoutDashboard, UserCheck, Users, Wrench, Package, Calendar,
   Sliders, Percent, AlertOctagon, Star, FileText, Download, Menu, X, Shield, LogOut
@@ -56,8 +55,7 @@ export default function AdminLayout() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
-      <DemoSwitcher />
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
 
       <div className="flex-1 flex">
         {/* Mobile Sidebar Overlay */}
@@ -77,8 +75,8 @@ export default function AdminLayout() {
           {/* Admin Header */}
           <div className="h-16 px-6 border-b border-slate-100 flex items-center justify-between">
             <Link to="/admin/dashboard" className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white font-extrabold text-sm shadow-xs">
-                <Shield className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center p-1 shadow-xs">
+                <img src="/logo.png" alt="Sahaayak Logo" className="w-full h-full object-contain" />
               </div>
               <span className="font-bold font-display text-slate-900 tracking-tight">Sahaayak Admin</span>
             </Link>

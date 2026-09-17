@@ -38,6 +38,7 @@ export default function BookingDetail() {
   const [complaintModalOpen, setComplaintModalOpen] = useState(false);
   const [complaintCategory, setComplaintCategory] = useState('Poor service');
   const [complaintDesc, setComplaintDesc] = useState('');
+  const [downloadingInvoice, setDownloadingInvoice] = useState(false);
 
   const loadBooking = async () => {
     try {
@@ -143,6 +144,34 @@ export default function BookingDetail() {
     }
   };
 
+  const handleDownloadInvoice = async () => {
+    try {
+      setDownloadingInvoice(true);
+      const res = await api.get(`/payments/invoice/${booking.id}`, {
+        responseType: 'blob'
+      });
+      const blob = new Blob([res.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${invoice?.invoice_number || 'Sahaayak_Tax_Invoice'}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      addToast('Invoice PDF downloaded successfully!', 'success');
+    } catch (err) {
+      console.warn('Invoice blob download failed, trying direct link...', err);
+      if (invoice?.pdf_url) {
+        window.open(`http://localhost:5000${invoice.pdf_url}`, '_blank');
+      } else {
+        addToast('Failed to download invoice. Please try again.', 'error');
+      }
+    } finally {
+      setDownloadingInvoice(false);
+    }
+  };
+
   if (loading || !data) {
     return (
       <div className="py-20 flex justify-center">
@@ -208,50 +237,90 @@ export default function BookingDetail() {
           )}
 
           {isFullySettled && invoice && (
-            <a
-              href={`http://localhost:5000/api/payments/invoice/${booking.id}`}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs shadow-sm transition-colors"
+            <button
+              onClick={handleDownloadInvoice}
+              disabled={downloadingInvoice}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs shadow-sm transition-colors cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>Download Invoice</span>
-            </a>
+              <Download className="w-3.5 h-3.5 text-brand-600" />
+              <span>{downloadingInvoice ? 'Downloading...' : 'Download Invoice (PDF)'}</span>
+            </button>
           )}
         </div>
       </div>
 
-      {/* Progress Timeline Stepper */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm overflow-x-auto">
-        <div className="min-w-[600px] flex items-center justify-between relative">
-          <div className="absolute top-1/2 left-4 right-4 h-1 bg-slate-100 -translate-y-1/2 z-0" />
-          <div
-            className="absolute top-1/2 left-4 h-1 bg-brand-600 -translate-y-1/2 z-0 transition-all duration-500"
-            style={{ width: `${Math.min(100, (effectiveStepIdx / (timelineSteps.length - 1)) * 100)}%` }}
-          />
+      {/* Progress Timeline Stepper / Booking Journey */}
+      <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm overflow-x-auto">
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-brand-600 animate-pulse" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700">
+              Booking Journey
+            </h3>
+          </div>
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-brand-50 text-brand-700 border border-brand-200">
+            Step {effectiveStepIdx + 1} of {timelineSteps.length}: {timelineSteps[effectiveStepIdx]?.label}
+          </span>
+        </div>
 
-          {timelineSteps.map((st, i) => {
-            const isDone = i <= effectiveStepIdx;
-            const isCurrent = i === effectiveStepIdx;
-            return (
-              <div key={st.key} className="flex flex-col items-center relative z-10 space-y-1.5">
-                <div
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                    isCurrent
-                      ? 'bg-brand-600 text-white ring-4 ring-brand-100 scale-110 shadow-md'
-                      : isDone
-                      ? 'bg-brand-600 text-white'
-                      : 'bg-white border-2 border-slate-200 text-slate-400'
-                  }`}
-                >
-                  {isDone ? <Check className="w-3.5 h-3.5" /> : i + 1}
-                </div>
-                <span className={`text-[11px] font-semibold whitespace-nowrap ${isCurrent ? 'text-brand-700 font-bold' : isDone ? 'text-slate-800' : 'text-slate-400'}`}>
-                  {st.label}
-                </span>
-              </div>
-            );
-          })}
+        <div className="min-w-[700px] px-2 pt-2 pb-6">
+          <div className="flex items-center w-full">
+            {timelineSteps.map((st, i) => {
+              const isDone = i <= effectiveStepIdx;
+              const isCurrent = i === effectiveStepIdx;
+              const isLast = i === timelineSteps.length - 1;
+
+              return (
+                <React.Fragment key={st.key}>
+                  {/* Step node */}
+                  <div className="relative flex flex-col items-center">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 z-10 ${
+                        isCurrent
+                          ? 'bg-brand-600 text-white ring-4 ring-brand-100 scale-110 shadow-md shadow-brand-600/20'
+                          : isDone
+                          ? 'bg-brand-600 text-white shadow-xs'
+                          : 'bg-white border-2 border-slate-300 text-slate-400'
+                      }`}
+                    >
+                      {isDone && !isCurrent ? (
+                        <Check className="w-4 h-4 text-white" />
+                      ) : (
+                        <span>{i + 1}</span>
+                      )}
+                    </div>
+
+                    <span
+                      className={`absolute top-10 text-[11px] font-semibold whitespace-nowrap text-center transition-colors ${
+                        isCurrent
+                          ? 'text-brand-700 font-bold'
+                          : isDone
+                          ? 'text-slate-800'
+                          : 'text-slate-400'
+                      }`}
+                    >
+                      {st.label}
+                    </span>
+                  </div>
+
+                  {/* Connecting Line Segment */}
+                  {!isLast && (
+                    <div className="flex-1 h-1 mx-1.5 rounded-full overflow-hidden bg-slate-100 relative">
+                      <div
+                        className={`h-full transition-all duration-500 rounded-full ${
+                          i < effectiveStepIdx
+                            ? 'w-full bg-brand-600'
+                            : i === effectiveStepIdx
+                            ? 'w-1/2 bg-brand-500 animate-pulse'
+                            : 'w-0'
+                        }`}
+                      />
+                    </div>
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </div>
         </div>
       </div>
 

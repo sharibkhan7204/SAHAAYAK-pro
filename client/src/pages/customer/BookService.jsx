@@ -11,14 +11,17 @@ import {
 export default function BookService() {
   const { serviceId, slug } = useParams();
   const targetParam = serviceId || slug || 'srv_home_clean';
-  const { user } = useAuth();
+  const { user, quickDemoLogin } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
 
   const [service, setService] = useState(null);
+  const [allServices, setAllServices] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [demoLoggingIn, setDemoLoggingIn] = useState(false);
 
   // Wizard state
   const [step, setStep] = useState(1); // 1: Dynamic Details, 2: Address & Schedule, 3: Review & Confirm
@@ -42,52 +45,136 @@ export default function BookService() {
     pincode: '560102'
   });
 
+  const initServiceFields = (s) => {
+    if (s && s.formSchema && s.formSchema.fields) {
+      const initial = {};
+      s.formSchema.fields.forEach((f) => {
+        if (f.default !== undefined) initial[f.name] = f.default;
+        else if (f.options && f.options.length > 0) initial[f.name] = f.options[0];
+        else initial[f.name] = '';
+      });
+      setDynamicFields(initial);
+    } else {
+      setDynamicFields({});
+    }
+  };
+
   useEffect(() => {
     async function loadData() {
       try {
-        const [servRes, addrRes] = await Promise.all([
-          api.get(`/services/${targetParam}`),
-          api.get('/customers/addresses')
-        ]);
+        setLoading(true);
+        setLoadError(null);
 
-        const s = servRes.data.service;
-        setService(s);
-
-        const addrs = addrRes.data.addresses || [];
-        setAddresses(addrs);
-        if (addrs.length > 0) {
-          const defaultAddr = addrs.find((a) => a.is_default) || addrs[0];
-          setSelectedAddressId(defaultAddr.id);
-        } else {
-          setShowNewAddress(true);
+        // 1. Always load all active services to ensure a fallback list exists
+        let servicesList = [];
+        try {
+          const allRes = await api.get('/services');
+          servicesList = allRes.data?.services || [];
+          setAllServices(servicesList);
+        } catch (e) {
+          console.warn('Could not fetch services list:', e);
         }
 
-        // Initialize default dynamic form values from schema
-        if (s.formSchema && s.formSchema.fields) {
-          const initial = {};
-          s.formSchema.fields.forEach((f) => {
-            if (f.default !== undefined) initial[f.name] = f.default;
-            else if (f.options && f.options.length > 0) initial[f.name] = f.options[0];
-            else initial[f.name] = '';
-          });
-          setDynamicFields(initial);
+        // 2. Resolve the target service by slug or ID
+        let matchedService = null;
+        const lookup = (targetParam || '').trim();
+
+        if (lookup && lookup !== 'undefined' && lookup !== 'null') {
+          // Check in the servicesList
+          matchedService = servicesList.find(s => s.slug === lookup || s.id === lookup);
+
+          // If not found in list, attempt individual GET
+          if (!matchedService) {
+            try {
+              const servRes = await api.get(`/services/${lookup}`);
+              matchedService = servRes.data?.service;
+            } catch (singleErr) {
+              console.warn(`Direct lookup for service "${lookup}" not found.`);
+            }
+          }
+        }
+
+        // 3. Graceful fallback: If no service was matched or no parameter provided, use first service
+        if (!matchedService && servicesList.length > 0) {
+          matchedService = servicesList[0];
+        }
+
+        if (!matchedService) {
+          setLoadError('Unable to load services catalog. Please verify that the backend server is running.');
+          return;
+        }
+
+        setService(matchedService);
+        initServiceFields(matchedService);
+
+        // 4. Load addresses if user is logged in as customer
+        const token = localStorage.getItem('sahaayak_token');
+        if (token && user?.role === 'customer') {
+          try {
+            const addrRes = await api.get('/customers/addresses');
+            const addrs = addrRes.data.addresses || [];
+            setAddresses(addrs);
+            if (addrs.length > 0) {
+              const defaultAddr = addrs.find((a) => a.is_default) || addrs[0];
+              setSelectedAddressId(defaultAddr.id);
+            } else {
+              setShowNewAddress(true);
+            }
+          } catch (addrErr) {
+            console.warn('Could not fetch customer addresses:', addrErr);
+            setShowNewAddress(true);
+          }
         }
       } catch (err) {
-        addToast('Service not found or error loading booking details.', 'error');
-        navigate('/services');
+        console.error('Error loading booking data:', err);
+        setLoadError('Error loading service booking details. Please refresh or try again.');
       } finally {
         setLoading(false);
       }
     }
     loadData();
-  }, [slug]);
+  }, [targetParam, user]);
+
+  const handleSelectService = (serviceId) => {
+    const found = allServices.find(s => s.id === serviceId);
+    if (found) {
+      setService(found);
+      initServiceFields(found);
+    }
+  };
 
   const handleFieldChange = (name, val) => {
     setDynamicFields((prev) => ({ ...prev, [name]: val }));
   };
 
+  const handleQuickDemoCustomer = async () => {
+    try {
+      setDemoLoggingIn(true);
+      await quickDemoLogin({
+        email: 'priya.sharma@example.com',
+        password: 'Customer@123',
+        role: 'customer'
+      });
+      addToast('Logged in as Demo Customer (Priya Sharma)!', 'success');
+      const addrRes = await api.get('/customers/addresses');
+      const addrs = addrRes.data.addresses || [];
+      setAddresses(addrs);
+      if (addrs.length > 0) {
+        setSelectedAddressId(addrs[0].id);
+        setShowNewAddress(false);
+      }
+    } catch (err) {
+      addToast(err.response?.data?.error || 'Failed to log in as demo customer.', 'error');
+    } finally {
+      setDemoLoggingIn(false);
+    }
+  };
+
   const handleSaveNewAddress = async (e) => {
     e.preventDefault();
+    if (!user) {
+      return addToast('Please sign in or use demo login to save an address.', 'warning');
+    }
     try {
       const res = await api.post('/customers/addresses', {
         ...newAddr,
@@ -122,6 +209,16 @@ export default function BookService() {
   };
 
   const handleConfirmBooking = async () => {
+    if (!user) {
+      addToast('Please sign in or use 1-click demo login to place a booking.', 'warning');
+      setStep(2);
+      return;
+    }
+
+    if (user.role !== 'customer') {
+      return addToast(`You are signed in as a ${user.role}. Please switch to a Customer account to book.`, 'warning');
+    }
+
     if (!selectedAddressId) {
       return addToast('Please select or add a service address.', 'warning');
     }
@@ -145,6 +242,32 @@ export default function BookService() {
       setSubmitting(false);
     }
   };
+
+  if (loadError && !service) {
+    return (
+      <div className="max-w-xl mx-auto py-20 px-4 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+          <AlertCircle className="w-6 h-6" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900">Service Catalog Notice</h2>
+        <p className="text-xs text-slate-600 leading-relaxed">{loadError}</p>
+        <div className="flex justify-center gap-3 pt-2">
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 rounded-xl bg-brand-600 text-white font-bold text-xs shadow-sm"
+          >
+            Retry Connection
+          </button>
+          <button
+            onClick={() => navigate('/services')}
+            className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 font-bold text-xs"
+          >
+            Browse Services
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading || !service) {
     return (
@@ -185,12 +308,29 @@ export default function BookService() {
       {/* STEP 1: DYNAMIC SERVICE SPECIFIC DETAILS */}
       {step === 1 && (
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-            <img src={service.image_url} alt="" className="w-14 h-14 rounded-2xl object-cover bg-slate-100" />
-            <div>
-              <h2 className="text-base font-bold text-slate-900">{service.name} Customization</h2>
-              <p className="text-xs text-slate-500">{service.description}</p>
+          <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4 flex-wrap">
+            <div className="flex items-center gap-3">
+              <img src={service.image_url} alt="" className="w-14 h-14 rounded-2xl object-cover bg-slate-100" />
+              <div>
+                <h2 className="text-base font-bold text-slate-900">{service.name} Customization</h2>
+                <p className="text-xs text-slate-500">{service.description}</p>
+              </div>
             </div>
+
+            {allServices.length > 1 && (
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-semibold text-slate-500">Select Service:</span>
+                <select
+                  value={service.id}
+                  onChange={(e) => handleSelectService(e.target.value)}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                >
+                  {allServices.map(s => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           <div className="space-y-4 text-xs">
@@ -262,6 +402,45 @@ export default function BookService() {
       {/* STEP 2: ADDRESS & SCHEDULE */}
       {step === 2 && (
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6 text-xs">
+          {/* Customer Auth prompt banner if not logged in as customer */}
+          {(!user || user.role !== 'customer') && (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-1.5 font-bold text-amber-900 text-xs">
+                  <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>
+                    {!user
+                      ? 'Sign in as a Customer to place this booking'
+                      : `Currently signed in as ${user.role}. Bookings require a Customer account.`}
+                  </span>
+                </div>
+                <p className="text-[11px] text-amber-700">
+                  You can use our pre-seeded test customer account with 1-click or sign in with your email.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  disabled={demoLoggingIn}
+                  onClick={handleQuickDemoCustomer}
+                  className="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-colors"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-saffron-300" />
+                  <span>{demoLoggingIn ? 'Logging in...' : '1-Click Demo Customer'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate(`/login?redirect=/book/${targetParam}`)}
+                  className="px-3 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs"
+                >
+                  Sign In
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Address selection */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">

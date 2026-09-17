@@ -76,9 +76,16 @@ export default function WorkerSignup() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-12">
       <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl space-y-6">
-        <div className="text-center space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold mb-1">
-            <Wrench className="w-3.5 h-3.5 text-amber-700" /> ₹0 Commission on Small Jobs (Protected)
+        <div className="text-center space-y-2">
+          <Link to="/" className="inline-flex items-center gap-2 group mb-1">
+            <div className="w-14 h-14 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center p-2 shadow-lg shadow-slate-950/20 group-hover:scale-105 transition-transform">
+              <img src="/logo.png" alt="Sahaayak Logo" className="w-full h-full object-contain filter drop-shadow" />
+            </div>
+          </Link>
+          <div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold mb-1">
+              <Wrench className="w-3.5 h-3.5 text-amber-700" /> ₹0 Commission on Small Jobs (Protected)
+            </div>
           </div>
           <h1 className="text-2xl font-bold font-display text-slate-900 tracking-tight">Become a Sahaayak Service Partner</h1>
           <p className="text-xs text-slate-500">Fast digital registration with Aadhaar & UPI payment details</p>

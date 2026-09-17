@@ -19,6 +19,9 @@ export default function Login() {
   const [twoFactorCode, setTwoFactorCode] = useState('123456');
 
   const redirectByRole = (role) => {
+    const searchParams = new URLSearchParams(location.search);
+    const redirectUrl = searchParams.get('redirect');
+    if (redirectUrl && role === 'customer') return redirectUrl;
     if (role === 'worker') return '/worker/dashboard';
     if (role === 'admin') return '/admin/dashboard';
     return '/customer/dashboard';
@@ -39,7 +42,11 @@ export default function Login() {
       addToast(`Welcome back, ${res.user.fullName}!`, 'success');
       navigate(redirectByRole(res.user.role));
     } catch (err) {
-      addToast(err.response?.data?.error || 'Login failed. Please check your credentials.', 'error');
+      if (!err.response) {
+        addToast('Cannot connect to Sahaayak server. Please ensure the backend server on port 5000 is running.', 'error');
+      } else {
+        addToast(err.response?.data?.error || 'Login failed. Please check your credentials.', 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -94,7 +101,11 @@ export default function Login() {
       addToast(`Logged in as demo ${acc.title}!`, 'success');
       navigate(redirectByRole(acc.role));
     } catch (err) {
-      addToast(err.response?.data?.error || 'Demo login failed.', 'error');
+      if (!err.response) {
+        addToast('Cannot connect to Sahaayak server. Please ensure the backend server on port 5000 is running.', 'error');
+      } else {
+        addToast(err.response?.data?.error || 'Demo login failed.', 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -130,7 +141,12 @@ export default function Login() {
 
         {/* Main Login Card */}
         <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl space-y-6">
-          <div className="text-center space-y-1">
+          <div className="text-center space-y-2">
+            <Link to="/" className="inline-flex items-center gap-2 group mb-1">
+              <div className="w-14 h-14 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center p-2 shadow-lg shadow-slate-950/20 group-hover:scale-105 transition-transform">
+                <img src="/logo.png" alt="Sahaayak Logo" className="w-full h-full object-contain filter drop-shadow" />
+              </div>
+            </Link>
             <h2 className="text-2xl font-bold font-display text-slate-900 tracking-tight">
               {twoFactorChallenge ? 'Two-Factor Authentication' : 'Welcome to Sahaayak'}
             </h2>

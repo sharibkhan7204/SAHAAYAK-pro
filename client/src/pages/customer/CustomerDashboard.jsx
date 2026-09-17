@@ -461,7 +461,7 @@ export default function CustomerDashboard() {
 
               <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
                 <Link
-                  to={`/customer/book/${selectedService.id}`}
+                  to={`/customer/book/${selectedService?.slug || selectedService?.id || 'home-cleaning'}`}
                   className="px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs transition"
                 >
                   Custom Details &amp; Notes

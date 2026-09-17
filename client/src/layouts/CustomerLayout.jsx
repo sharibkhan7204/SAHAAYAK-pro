@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import DemoSwitcher from '../components/common/DemoSwitcher';
 import Navbar from '../components/common/Navbar';
 import { LayoutDashboard, Calendar, MapPin, User, PlusCircle } from 'lucide-react';
 
@@ -11,7 +10,7 @@ export default function CustomerLayout() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="animate-spin w-8 h-8 border-4 border-brand-600 border-t-transparent rounded-full" />
       </div>
     );
@@ -29,8 +28,7 @@ export default function CustomerLayout() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 pb-16 md:pb-0">
-      <DemoSwitcher />
+    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 md:pb-0 transition-colors">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-1">
