@@ -6,11 +6,11 @@ import api from '../../services/api';
 import {
   IndianRupee, Briefcase, Star, Award, MapPin, ArrowRight,
   Clock, Navigation, ShieldCheck, CheckCircle2, ChevronRight, AlertCircle,
-  Bell, Check, X, Phone
+  Bell, Check, X, Phone, LogOut
 } from 'lucide-react';
 
 export default function WorkerDashboard() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
 
@@ -132,14 +132,26 @@ export default function WorkerDashboard() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 flex-wrap">
           <Link
             to="/worker/jobs"
-            className="px-5 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md shadow-brand-600/20 transition-all flex items-center gap-2"
+            className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md shadow-brand-600/20 transition-all flex items-center gap-2"
           >
             <span>View All Jobs</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
+          <button
+            onClick={() => {
+              logout();
+              addToast('Logged out of Partner Portal', 'info');
+              navigate('/login');
+            }}
+            className="px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700 font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+            title="Log out of Partner Portal"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Logout</span>
+          </button>
         </div>
       </div>
 

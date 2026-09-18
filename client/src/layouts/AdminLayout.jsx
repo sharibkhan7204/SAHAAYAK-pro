@@ -128,12 +128,12 @@ export default function AdminLayout() {
           </div>
 
           {/* Admin Profile Footer */}
-          <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div className="p-4 border-t border-slate-200 bg-slate-50 space-y-2.5">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-xs border border-brand-200">
+              <div className="w-8 h-8 rounded-full bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-xs border border-brand-200 shrink-0">
                 A
               </div>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <div className="text-xs font-semibold text-slate-900 truncate">{user.fullName}</div>
                 <div className="text-[10px] text-slate-500">Super Admin (2FA)</div>
               </div>
@@ -141,28 +141,54 @@ export default function AdminLayout() {
             <button
               onClick={() => {
                 logout();
-                navigate('/');
+                navigate('/login');
               }}
-              title="Log out"
-              className="p-1.5 text-slate-500 hover:text-rose-600 rounded-lg hover:bg-slate-200 transition-colors"
+              className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 transition-all cursor-pointer shadow-xs"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Log Out</span>
             </button>
           </div>
         </aside>
 
         {/* Content Area */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          {/* Mobile Top Navbar with hamburger */}
-          <header className="lg:hidden h-14 bg-white border-b border-slate-200 px-4 flex items-center justify-between">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="text-slate-600 hover:text-slate-900 p-1"
-            >
-              <Menu className="w-6 h-6" />
-            </button>
-            <span className="text-sm font-bold text-slate-900">Sahaayak Administration</span>
-            <div className="w-6" />
+          {/* Top Navbar with Navigation & Logout */}
+          <header className="h-16 bg-white border-b border-slate-200 px-4 sm:px-6 flex items-center justify-between shadow-xs">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden text-slate-600 hover:text-slate-900 p-1.5 rounded-lg hover:bg-slate-100"
+                aria-label="Open sidebar"
+              >
+                <Menu className="w-6 h-6" />
+              </button>
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-brand-600 hidden sm:inline" />
+                <span className="text-sm sm:text-base font-bold text-slate-900 font-display">
+                  Admin Command Center
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span className="hidden sm:inline-flex items-center gap-1.5 text-xs text-slate-600 bg-slate-100 px-3 py-1 rounded-full border border-slate-200 font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>{user.fullName}</span>
+              </span>
+
+              <button
+                onClick={() => {
+                  logout();
+                  navigate('/login');
+                }}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 transition-all cursor-pointer shadow-xs"
+                title="Log out of Admin Portal"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Logout</span>
+              </button>
+            </div>
           </header>
 
           <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">

@@ -6,10 +6,10 @@ import { useToast } from '../contexts/ToastContext';
 // Remove DemoSwitcher import
 import Navbar from '../components/common/Navbar';
 import api from '../services/api';
-import { LayoutDashboard, Briefcase, IndianRupee, UserCheck, Power, Navigation, Bell } from 'lucide-react';
+import { LayoutDashboard, Briefcase, IndianRupee, UserCheck, Power, Navigation, Bell, LogOut } from 'lucide-react';
 
 export default function WorkerLayout() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const { socket } = useSocket();
   const { addToast } = useToast();
   const location = useLocation();
@@ -118,12 +118,12 @@ export default function WorkerLayout() {
             </div>
           </Link>
 
-          {/* Online / Offline Toggle Button */}
-          <div className="flex items-center gap-3">
+          {/* Online / Offline Toggle & Logout Button */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={handleToggleOnline}
               disabled={toggleLoading}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-xs ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shadow-xs cursor-pointer ${
                 isOnline
                   ? 'bg-emerald-50 text-emerald-700 border border-emerald-300 hover:bg-emerald-100 radar-live'
                   : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
@@ -131,6 +131,19 @@ export default function WorkerLayout() {
             >
               <Power className={`w-3.5 h-3.5 ${isOnline ? 'text-emerald-600' : 'text-slate-500'}`} />
               <span>{isOnline ? 'ONLINE & READY' : 'OFFLINE'}</span>
+            </button>
+
+            <button
+              onClick={() => {
+                logout();
+                addToast('Logged out of Partner Portal', 'info');
+                navigate('/login');
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:text-white bg-rose-50 hover:bg-rose-600 border border-rose-200 hover:border-rose-600 transition-all cursor-pointer shadow-xs"
+              title="Logout from Partner Portal"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Logout</span>
             </button>
           </div>
         </div>
@@ -249,6 +262,17 @@ export default function WorkerLayout() {
             </Link>
           );
         })}
+        <button
+          onClick={() => {
+            logout();
+            addToast('Logged out of Partner Portal', 'info');
+            navigate('/login');
+          }}
+          className="flex flex-col items-center py-1 px-3 text-[10px] font-medium text-rose-600 hover:text-rose-700 transition-colors cursor-pointer"
+        >
+          <LogOut className="w-5 h-5 mb-0.5" />
+          <span>Logout</span>
+        </button>
       </div>
     </div>
   );
